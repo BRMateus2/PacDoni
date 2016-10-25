@@ -1,0 +1,10 @@
+Blinky:
+	Of all the ghosts, this one’s the easiest to describe. In Chase Mode, Blinky’s target is Pac-Man,
+	and the ghost will hunt the player constantly until its pattern switches to Scatter Mode and it
+	heads back to its corner of the maze. There is, however a bit of a twist: when there are 20 dots
+	left in the maze, Blinky’s speed will increase slightly. Its speed will increase again when there
+	are 10 dots left. At these points, Blinky’s behaviour in Scatter Mode will also change; instead of
+	moving back to its corner at the top right of the maze, it will continue to chase Pac-Man. This
+	behaviour, curiously dubbed 'Cruise Elroy' by players, makes Blinky the most fearsome character
+	in the game, since it’ll only switch back to its less speedy, persistent state once the player’s
+	either eaten all the dots or lost a life.
