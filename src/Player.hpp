@@ -1,0 +1,47 @@
+#pragma once
+
+class Player{
+private:
+	int* i;
+	int* j;
+	int* super_force;
+	int* eaten_biscuits;
+	int* direction;
+	int* desired_direction;
+	int* sprite_num;
+	int* lifes;
+	int* item;
+
+public:
+	Player(int i, int j);
+	Player(const Player& p);
+	~Player();
+
+	void set_i(int i);
+	int get_i();
+
+	void set_j(int j);
+	int get_j();
+
+	int get_super_force();
+	void decrease_super_force();
+	void fill_super_force();
+
+	void set_eaten_biscuits(int eaten_biscuits);
+	int get_eaten_biscuits();
+
+	void set_direction(int direction);
+	int get_direction();
+
+	void set_desired_direction(int desired_direction);
+	int get_desired_direction();
+
+	void set_sprites_num(int sprite_num);
+	int get_sprites_num();
+
+	void set_lifes(int lifes);
+	int get_lifes();
+
+	void set_item(int item);
+	int get_item();
+};

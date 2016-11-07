@@ -12,3 +12,4 @@ classe character, que diz o quanto ele andou em uma célula, atribuir uma nova p
 - Servidor envia para o cliente, mapa(apenas para desenho, inicialmente) e tupla (personagem, x, y, slice, sentido)
 para que possa ser denhado.
 - cliente burro, apenas desenha e envia comando para servidor( que deve tratar colisão)
+-TAM MAX = 17 px
