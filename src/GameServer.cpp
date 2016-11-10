@@ -14,173 +14,106 @@ using namespace std;
 mutex mt;
 
 //Verifica colisão do pac-man
-bool collide(Player& player, Map& g_map, int direction, bool last_try){
+bool collide(Player* player, Map* g_map, int direction, bool last_try){
 
-	bool p_g = false;
-	bool p_p = false;
-	bool p_b = false;
-	bool p_s = false;
-	bool p_i = false;
 	bool p_w = false;
-
 	char v;
-
-	vector<pair<int,int>> b_pos;
 
 	switch(direction){
 		case 0:
 			for(int j = 0; j < 16; j++){
-				v = g_map.get_map_at(player.get_i() + 16, player.get_j() + j);
+				v = g_map->get_map_at(player->get_i() + 16, player->get_j() + j);
 
 				if(v == '1'){
 					p_w = true;
-				}else
-				if(v == '3'){
-					p_p = true;
-				}else
-				if(v == '4'){
-					p_g = true;
-				}else
-				if(v == '5'){
-					p_b = true;
-					b_pos.push_back(make_pair(player.get_i() + 16, player.get_j() + j));
-				}else
-				if(v == '6'){
-					p_s = true;
-					b_pos.push_back(make_pair(player.get_i() + 16, player.get_j() + j));
-				}else
-				if(v == '7'){
-					p_i = true;
-					b_pos.push_back(make_pair(player.get_i() + 16, player.get_j() + j));
 				}
 			}
 
-			if(!p_w && !p_p){
-				if(p_g){
+			if(!p_w){
+				//Poso mover o pac
+				g_map->set_map_at(player->get_i(), player->get_j(), '0');
+				player->set_i(player->get_i() + 1);
+
+				if(g_map->get_map_at(player->get_i(), player->get_j()) == '5'){
+					//Remove o biscuit da lista de biscuits
+					map<pair<int, int>, char>::iterator it;
+					it = g_map->get_biscuits()->find(make_pair(player->get_i(), player->get_j()));
+					g_map->get_biscuits()->erase(it);
+
+					//Aumenta número biscoitos jogador
+					player->set_eaten_biscuits(player->get_eaten_biscuits() + 1);
+
+					//Altera os valores do mapa
+					g_map->set_map_at(player->get_i(), player->get_j(), '3');
+
+					//verifica super
+					player->decrease_super_force();
+
+					//muda direção
+					player->set_direction(direction);
+
+				}else
+				if(g_map->get_map_at(player->get_i(), player->get_j()) == '6'){
+					//Remove Biscuit
+					map<pair<int, int>, char>::iterator it;
+					it = g_map->get_s_biscuits()->find(make_pair(player->get_i(), player->get_j()));
+					g_map->get_s_biscuits()->erase(it);
+
+					//Aumenta número biscoitos jogador
+					player->set_eaten_biscuits(player->get_eaten_biscuits() + 1);
+
+					//Altera os valores do mapa
+					g_map->set_map_at(player->get_i(), player->get_j(), '3');
+
+					//verifica super
+					player->fill_super_force();
+
+					//muda direção
+					player->set_direction(player->get_desired_direction());
+
+				}else
+				if(g_map->get_map_at(player->get_i(), player->get_j()) == '7'){
+					//Altera os valores do mapa
+					g_map->set_map_at(player->get_i(), player->get_j(), '3');
+
+					//verifica super
+					player->decrease_super_force();
+
+					//Pega o item
+					player->set_item(7);
+
+					//muda direção
+					player->set_direction(direction);
+
+				}else
+				if(g_map->get_map_at(player->get_i(), player->get_j()) == '4'){
 					//KILL PAC-MAN
 					//verifica se esta super
 					//Define sprite
 					//seta número de lifes
-				}else
-				if(p_b){ // Colisão com biscoito
-					//Remove Biscuit
-					map<pair<int, int>, char>::iterator it;
-					it = g_map.get_biscuits()->find(b_pos[0]);
-					g_map.get_biscuits()->erase(it);
-
-					//Aumenta número biscoitos jogador
-					player.set_eaten_biscuits(player.get_eaten_biscuits() + 1);
-
-					//Move pac-man [Baixo: +1i]
-					g_map.set_map_at(player.get_i(), player.get_j(), '0');
-					player.set_i(player.get_i() + 1);
-					g_map.set_map_at(player.get_i(), player.get_j(), '3');
-
-					//verifica super
-					player.decrease_super_force();
-
-					//Define sprite
-					if(player.get_sprites_num() == 0){
-						player.set_sprites_num(1);
-					}else
-					if(player.get_sprites_num() == 1){
-						player.set_sprites_num(2);
-					}else
-					if(player.get_sprites_num() == 2){
-						player.set_sprites_num(0);
-					}else{
-						player.set_sprites_num(0);
-					}
-
-					//muda direção
-					player.set_direction(direction);
-
-				}else
-				if(p_s){ //Colisão com super biscoito
-					//Remove Biscuit
-					map<pair<int, int>, char>::iterator it;
-					it = g_map.get_s_biscuits()->find(b_pos[0]);
-					g_map.get_s_biscuits()->erase(it);
-
-					//Aumenta número biscoitos jogador
-					player.set_eaten_biscuits(player.get_eaten_biscuits() + 1);
-
-					//Move pac-man [Baixo: +1 i]
-					g_map.set_map_at(player.get_i(), player.get_j(), '0');
-					player.set_i(player.get_i() + 1);
-					g_map.set_map_at(player.get_i(), player.get_j(), '3');
-
-					//verifica super
-					player.fill_super_force();
-
-					//Define sprite
-					if(player.get_sprites_num() == 0){
-						player.set_sprites_num(1);
-					}else
-					if(player.get_sprites_num() == 1){
-						player.set_sprites_num(2);
-					}else
-					if(player.get_sprites_num() == 2){
-						player.set_sprites_num(0);
-					}else{
-						player.set_sprites_num(0);
-					}
-
-					//muda direção
-					player.set_direction(player.get_desired_direction());
-
-				}else
-				if(p_i){
-					//Move pac-man [Baixo: +1i]
-					g_map.set_map_at(player.get_i(), player.get_j(), '0');
-					player.set_i(player.get_i() + 1);
-					g_map.set_map_at(player.get_i(), player.get_j(), '3');
-
-					//verifica super
-					player.decrease_super_force();
-
-					//Define sprite
-					if(player.get_sprites_num() == 0){
-						player.set_sprites_num(1);
-					}else
-					if(player.get_sprites_num() == 1){
-						player.set_sprites_num(2);
-					}else
-					if(player.get_sprites_num() == 2){
-						player.set_sprites_num(0);
-					}else{
-						player.set_sprites_num(0);
-					}
-
-					//Pega o item
-					player.set_item(7);
-
-					//muda direção
-					player.set_direction(direction);
 				}else{
-					//Move pac-man [Baixo: +1i]
-					g_map.set_map_at(player.get_i(), player.get_j(), '0');
-					player.set_i(player.get_i() + 1);
-					g_map.set_map_at(player.get_i(), player.get_j(), '3');
+					//Altera os valores do mapa
+					g_map->set_map_at(player->get_i(), player->get_j(), '3');
 
 					//verifica super
-					player.decrease_super_force();
-
-					//Define sprite
-					if(player.get_sprites_num() == 0){
-						player.set_sprites_num(1);
-					}else
-					if(player.get_sprites_num() == 1){
-						player.set_sprites_num(2);
-					}else
-					if(player.get_sprites_num() == 2){
-						player.set_sprites_num(0);
-					}else{
-						player.set_sprites_num(0);
-					}
+					player->decrease_super_force();
 
 					//muda direção
-					player.set_direction(direction);
+					player->set_direction(direction);
+
+				}
+
+				//Define sprite
+				if(player->get_sprites_num() == 0){
+					player->set_sprites_num(1);
+				}else
+				if(player->get_sprites_num() == 1){
+					player->set_sprites_num(2);
+				}else
+				if(player->get_sprites_num() == 2){
+					player->set_sprites_num(0);
+				}else{
+					player->set_sprites_num(0);
 				}
 
 				return true;
@@ -188,168 +121,108 @@ bool collide(Player& player, Map& g_map, int direction, bool last_try){
 			}else{
 				if(last_try){
 					//Define sprite
-					player.set_sprites_num(2);
+					player->set_sprites_num(2);
 					//Verifica super
-					player.decrease_super_force();
+					player->decrease_super_force();
 				}
-
 				return false;
 			}
 		break;
 
 		case 1:
 			for(int j = 0; j < 16; j++){
-				v = g_map.get_map_at(player.get_i() - 1, player.get_j() + j);
+				v = g_map->get_map_at(player->get_i() - 1, player->get_j() + j);
 
 				if(v == '1'){
 					p_w = true;
-				}else
-				if(v == '3'){
-					p_p = true;
-				}else
-				if(v == '4'){
-					p_g = true;
-				}else
-				if(v == '5'){
-					p_b = true;
-					b_pos.push_back(make_pair(player.get_i() - 1, player.get_j() + j));
-				}else
-				if(v == '6'){
-					p_s = true;
-					b_pos.push_back(make_pair(player.get_i() - 1, player.get_j() + j));
-				}else
-				if(v == '7'){
-					p_i = true;
-					b_pos.push_back(make_pair(player.get_i() - 1, player.get_j() + j));
 				}
 			}
 
-			if(!p_w && !p_p){
-				if(p_g){
+			if(!p_w){
+				//Poso mover o pac
+				g_map->set_map_at(player->get_i(), player->get_j(), '0');
+				player->set_i(player->get_i() - 1);
+
+				if(g_map->get_map_at(player->get_i(), player->get_j()) == '5'){
+					//Remove o biscuit da lista de biscuits
+					map<pair<int, int>, char>::iterator it;
+					it = g_map->get_biscuits()->find(make_pair(player->get_i(), player->get_j()));
+					g_map->get_biscuits()->erase(it);
+
+					//Aumenta número biscoitos jogador
+					player->set_eaten_biscuits(player->get_eaten_biscuits() + 1);
+
+					//Altera os valores do mapa
+					g_map->set_map_at(player->get_i(), player->get_j(), '3');
+
+					//verifica super
+					player->decrease_super_force();
+
+					//muda direção
+					player->set_direction(direction);
+
+				}else
+				if(g_map->get_map_at(player->get_i(), player->get_j()) == '6'){
+					//Remove Biscuit
+					map<pair<int, int>, char>::iterator it;
+					it = g_map->get_s_biscuits()->find(make_pair(player->get_i(), player->get_j()));
+					g_map->get_s_biscuits()->erase(it);
+
+					//Aumenta número biscoitos jogador
+					player->set_eaten_biscuits(player->get_eaten_biscuits() + 1);
+
+					//Altera os valores do mapa
+					g_map->set_map_at(player->get_i(), player->get_j(), '3');
+
+					//verifica super
+					player->fill_super_force();
+
+					//muda direção
+					player->set_direction(player->get_desired_direction());
+
+				}else
+				if(g_map->get_map_at(player->get_i(), player->get_j()) == '7'){
+					//Altera os valores do mapa
+					g_map->set_map_at(player->get_i(), player->get_j(), '3');
+
+					//verifica super
+					player->decrease_super_force();
+
+					//Pega o item
+					player->set_item(7);
+
+					//muda direção
+					player->set_direction(direction);
+
+				}else
+				if(g_map->get_map_at(player->get_i(), player->get_j()) == '4'){
 					//KILL PAC-MAN
 					//verifica se esta super
 					//Define sprite
 					//seta número de lifes
-				}else
-				if(p_b){ // Colisão com biscoito
-					//Remove Biscuit
-					map<pair<int, int>, char>::iterator it;
-					it = g_map.get_biscuits()->find(b_pos[0]);
-					g_map.get_biscuits()->erase(it);
-
-					//Aumenta número biscoitos jogador
-					player.set_eaten_biscuits(player.get_eaten_biscuits() + 1);
-
-					//Move pac-man [Baixo: +1i]
-					g_map.set_map_at(player.get_i(), player.get_j(), '0');
-					player.set_i(player.get_i() - 1);
-					g_map.set_map_at(player.get_i(), player.get_j(), '3');
-
-					//verifica super
-					player.decrease_super_force();
-
-					//Define sprite
-					if(player.get_sprites_num() == 0){
-						player.set_sprites_num(3);
-					}else
-					if(player.get_sprites_num() == 3){
-						player.set_sprites_num(4);
-					}else
-					if(player.get_sprites_num() == 4){
-						player.set_sprites_num(0);
-					}else{
-						player.set_sprites_num(0);
-					}
-
-					//muda direção
-					player.set_direction(direction);
-
-				}else
-				if(p_s){ //Colisão com super biscoito
-					//Remove Biscuit
-					map<pair<int, int>, char>::iterator it;
-					it = g_map.get_s_biscuits()->find(b_pos[0]);
-					g_map.get_s_biscuits()->erase(it);
-
-					//Aumenta número biscoitos jogador
-					player.set_eaten_biscuits(player.get_eaten_biscuits() + 1);
-
-					//Move pac-man [Baixo: +1 i]
-					g_map.set_map_at(player.get_i(), player.get_j(), '0');
-					player.set_i(player.get_i() - 1);
-					g_map.set_map_at(player.get_i(), player.get_j(), '3');
-
-					//verifica super
-					player.fill_super_force();
-
-					//Define sprite
-					if(player.get_sprites_num() == 0){
-						player.set_sprites_num(3);
-					}else
-					if(player.get_sprites_num() == 3){
-						player.set_sprites_num(4);
-					}else
-					if(player.get_sprites_num() == 4){
-						player.set_sprites_num(0);
-					}else{
-						player.set_sprites_num(0);
-					}
-
-					//muda direção
-					player.set_direction(direction);
-
-				}else
-				if(p_i){
-					//Move pac-man [Baixo: +1i]
-					g_map.set_map_at(player.get_i(), player.get_j(), '0');
-					player.set_i(player.get_i() - 1);
-					g_map.set_map_at(player.get_i(), player.get_j(), '3');
-
-					//verifica super
-					player.decrease_super_force();
-
-					//Define sprite
-					if(player.get_sprites_num() == 0){
-						player.set_sprites_num(3);
-					}else
-					if(player.get_sprites_num() == 3){
-						player.set_sprites_num(4);
-					}else
-					if(player.get_sprites_num() == 4){
-						player.set_sprites_num(0);
-					}else{
-						player.set_sprites_num(0);
-					}
-
-					//Pega o item
-					player.set_item(7);
-
-					//muda direção
-					player.set_direction(direction);
 				}else{
-					//Move pac-man [Baixo: +1i]
-					g_map.set_map_at(player.get_i(), player.get_j(), '0');
-					player.set_i(player.get_i() - 1);
-					g_map.set_map_at(player.get_i(), player.get_j(), '3');
+					//Altera os valores do mapa
+					g_map->set_map_at(player->get_i(), player->get_j(), '3');
 
 					//verifica super
-					player.decrease_super_force();
-
-					//Define sprite
-					if(player.get_sprites_num() == 0){
-						player.set_sprites_num(3);
-					}else
-					if(player.get_sprites_num() == 3){
-						player.set_sprites_num(4);
-					}else
-					if(player.get_sprites_num() == 4){
-						player.set_sprites_num(0);
-					}else{
-						player.set_sprites_num(0);
-					}
+					player->decrease_super_force();
 
 					//muda direção
-					player.set_direction(direction);
+					player->set_direction(direction);
+
+				}
+
+				//Define sprite
+				if(player->get_sprites_num() == 0){
+					player->set_sprites_num(3);
+				}else
+				if(player->get_sprites_num() == 3){
+					player->set_sprites_num(4);
+				}else
+				if(player->get_sprites_num() == 4){
+					player->set_sprites_num(0);
+				}else{
+					player->set_sprites_num(0);
 				}
 
 				return true;
@@ -357,168 +230,108 @@ bool collide(Player& player, Map& g_map, int direction, bool last_try){
 			}else{
 				if(last_try){
 					//Define sprite
-					player.set_sprites_num(4);
+					player->set_sprites_num(4);
 					//Verifica super
-					player.decrease_super_force();
+					player->decrease_super_force();
 				}
-
 				return false;
 			}
 		break;
 
 		case 2:
 			for(int j = 0; j < 16; j++){
-				v = g_map.get_map_at(player.get_i() + j, player.get_j() + 16);
+				v = g_map->get_map_at(player->get_i() + j, player->get_j() + 16);
 
 				if(v == '1'){
 					p_w = true;
-				}else
-				if(v == '3'){
-					p_p = true;
-				}else
-				if(v == '4'){
-					p_g = true;
-				}else
-				if(v == '5'){
-					p_b = true;
-					b_pos.push_back(make_pair(player.get_i() + j, player.get_j() + 16));
-				}else
-				if(v == '6'){
-					p_s = true;
-					b_pos.push_back(make_pair(player.get_i() + j, player.get_j() + 16));
-				}else
-				if(v == '7'){
-					p_i = true;
-					b_pos.push_back(make_pair(player.get_i() + j, player.get_j() + 16));
 				}
 			}
 
-			if(!p_w && !p_p){
-				if(p_g){
+			if(!p_w){
+				//Poso mover o pac
+				g_map->set_map_at(player->get_i(), player->get_j(), '0');
+				player->set_j(player->get_j() + 1);
+
+				if(g_map->get_map_at(player->get_i(), player->get_j()) == '5'){
+					//Remove o biscuit da lista de biscuits
+					map<pair<int, int>, char>::iterator it;
+					it = g_map->get_biscuits()->find(make_pair(player->get_i(), player->get_j()));
+					g_map->get_biscuits()->erase(it);
+
+					//Aumenta número biscoitos jogador
+					player->set_eaten_biscuits(player->get_eaten_biscuits() + 1);
+
+					//Altera os valores do mapa
+					g_map->set_map_at(player->get_i(), player->get_j(), '3');
+
+					//verifica super
+					player->decrease_super_force();
+
+					//muda direção
+					player->set_direction(direction);
+
+				}else
+				if(g_map->get_map_at(player->get_i(), player->get_j()) == '6'){
+					//Remove Biscuit
+					map<pair<int, int>, char>::iterator it;
+					it = g_map->get_s_biscuits()->find(make_pair(player->get_i(), player->get_j()));
+					g_map->get_s_biscuits()->erase(it);
+
+					//Aumenta número biscoitos jogador
+					player->set_eaten_biscuits(player->get_eaten_biscuits() + 1);
+
+					//Altera os valores do mapa
+					g_map->set_map_at(player->get_i(), player->get_j(), '3');
+
+					//verifica super
+					player->fill_super_force();
+
+					//muda direção
+					player->set_direction(player->get_desired_direction());
+
+				}else
+				if(g_map->get_map_at(player->get_i(), player->get_j()) == '7'){
+					//Altera os valores do mapa
+					g_map->set_map_at(player->get_i(), player->get_j(), '3');
+
+					//verifica super
+					player->decrease_super_force();
+
+					//Pega o item
+					player->set_item(7);
+
+					//muda direção
+					player->set_direction(direction);
+
+				}else
+				if(g_map->get_map_at(player->get_i(), player->get_j()) == '4'){
 					//KILL PAC-MAN
 					//verifica se esta super
 					//Define sprite
 					//seta número de lifes
-				}else
-				if(p_b){ // Colisão com biscoito
-					//Remove Biscuit
-					map<pair<int, int>, char>::iterator it;
-					it = g_map.get_biscuits()->find(b_pos[0]);
-					g_map.get_biscuits()->erase(it);
-
-					//Aumenta número biscoitos jogador
-					player.set_eaten_biscuits(player.get_eaten_biscuits() + 1);
-
-					//Move pac-man [Baixo: +1i]
-					g_map.set_map_at(player.get_i(), player.get_j(), '0');
-					player.set_j(player.get_j() + 1);
-					g_map.set_map_at(player.get_i(), player.get_j(), '3');
-
-					//verifica super
-					player.decrease_super_force();
-
-					//Define sprite
-					if(player.get_sprites_num() == 0){
-						player.set_sprites_num(5);
-					}else
-					if(player.get_sprites_num() == 5){
-						player.set_sprites_num(6);
-					}else
-					if(player.get_sprites_num() == 6){
-						player.set_sprites_num(0);
-					}else{
-						player.set_sprites_num(0);
-					}
-
-					//muda direção
-					player.set_direction(direction);
-
-				}else
-				if(p_s){ //Colisão com super biscoito
-					//Remove Biscuit
-					map<pair<int, int>, char>::iterator it;
-					it = g_map.get_s_biscuits()->find(b_pos[0]);
-					g_map.get_s_biscuits()->erase(it);
-
-					//Aumenta número biscoitos jogador
-					player.set_eaten_biscuits(player.get_eaten_biscuits() + 1);
-
-					//Move pac-man [Baixo: +1 i]
-					g_map.set_map_at(player.get_i(), player.get_j(), '0');
-					player.set_j(player.get_j() + 1);
-					g_map.set_map_at(player.get_i(), player.get_j(), '3');
-
-					//verifica super
-					player.fill_super_force();
-
-					//Define sprite
-					if(player.get_sprites_num() == 0){
-						player.set_sprites_num(5);
-					}else
-					if(player.get_sprites_num() == 5){
-						player.set_sprites_num(6);
-					}else
-					if(player.get_sprites_num() == 6){
-						player.set_sprites_num(0);
-					}else{
-						player.set_sprites_num(0);
-					}
-
-					//muda direção
-					player.set_direction(direction);
-
-				}else
-				if(p_i){
-					//Move pac-man [Baixo: +1i]
-					g_map.set_map_at(player.get_i(), player.get_j(), '0');
-					player.set_j(player.get_j() + 1);
-					g_map.set_map_at(player.get_i(), player.get_j(), '3');
-
-					//verifica super
-					player.decrease_super_force();
-
-					//Define sprite
-					if(player.get_sprites_num() == 0){
-						player.set_sprites_num(5);
-					}else
-					if(player.get_sprites_num() == 5){
-						player.set_sprites_num(6);
-					}else
-					if(player.get_sprites_num() == 6){
-						player.set_sprites_num(0);
-					}else{
-						player.set_sprites_num(0);
-					}
-
-					//Pega o item
-					player.set_item(7);
-
-					//muda direção
-					player.set_direction(direction);
 				}else{
-					//Move pac-man [Baixo: +1i]
-					g_map.set_map_at(player.get_i(), player.get_j(), '0');
-					player.set_j(player.get_j() + 1);
-					g_map.set_map_at(player.get_i(), player.get_j(), '3');
+					//Altera os valores do mapa
+					g_map->set_map_at(player->get_i(), player->get_j(), '3');
 
 					//verifica super
-					player.decrease_super_force();
-
-					//Define sprite
-					if(player.get_sprites_num() == 0){
-						player.set_sprites_num(5);
-					}else
-					if(player.get_sprites_num() == 5){
-						player.set_sprites_num(6);
-					}else
-					if(player.get_sprites_num() == 6){
-						player.set_sprites_num(0);
-					}else{
-						player.set_sprites_num(0);
-					}
+					player->decrease_super_force();
 
 					//muda direção
-					player.set_direction(direction);
+					player->set_direction(direction);
+
+				}
+
+				//Define sprite
+				if(player->get_sprites_num() == 0){
+					player->set_sprites_num(5);
+				}else
+				if(player->get_sprites_num() == 5){
+					player->set_sprites_num(6);
+				}else
+				if(player->get_sprites_num() == 6){
+					player->set_sprites_num(0);
+				}else{
+					player->set_sprites_num(0);
 				}
 
 				return true;
@@ -526,168 +339,108 @@ bool collide(Player& player, Map& g_map, int direction, bool last_try){
 			}else{
 				if(last_try){
 					//Define sprite
-					player.set_sprites_num(6);
+					player->set_sprites_num(6);
 					//Verifica super
-					player.decrease_super_force();
+					player->decrease_super_force();
 				}
-
 				return false;
 			}
 		break;
 
 		case 3:
 			for(int j = 0; j < 16; j++){
-				v = g_map.get_map_at(player.get_i() + j, player.get_j() - 1);
+				v = g_map->get_map_at(player->get_i() + j, player->get_j() - 1);
 
 				if(v == '1'){
 					p_w = true;
-				}else
-				if(v == '3'){
-					p_p = true;
-				}else
-				if(v == '4'){
-					p_g = true;
-				}else
-				if(v == '5'){
-					p_b = true;
-					b_pos.push_back(make_pair(player.get_i() + j, player.get_j() - 1));
-				}else
-				if(v == '6'){
-					p_s = true;
-					b_pos.push_back(make_pair(player.get_i() + j, player.get_j() - 1));
-				}else
-				if(v == '7'){
-					p_i = true;
-					b_pos.push_back(make_pair(player.get_i() + j, player.get_j() - 1));
 				}
 			}
 
-			if(!p_w && !p_p){
-				if(p_g){
+			if(!p_w){
+				//Poso mover o pac
+				g_map->set_map_at(player->get_i(), player->get_j(), '0');
+				player->set_j(player->get_j() - 1);
+
+				if(g_map->get_map_at(player->get_i(), player->get_j()) == '5'){
+					//Remove o biscuit da lista de biscuits
+					map<pair<int, int>, char>::iterator it;
+					it = g_map->get_biscuits()->find(make_pair(player->get_i(), player->get_j()));
+					g_map->get_biscuits()->erase(it);
+
+					//Aumenta número biscoitos jogador
+					player->set_eaten_biscuits(player->get_eaten_biscuits() + 1);
+
+					//Altera os valores do mapa
+					g_map->set_map_at(player->get_i(), player->get_j(), '3');
+
+					//verifica super
+					player->decrease_super_force();
+
+					//muda direção
+					player->set_direction(direction);
+
+				}else
+				if(g_map->get_map_at(player->get_i(), player->get_j()) == '6'){
+					//Remove Biscuit
+					map<pair<int, int>, char>::iterator it;
+					it = g_map->get_s_biscuits()->find(make_pair(player->get_i(), player->get_j()));
+					g_map->get_s_biscuits()->erase(it);
+
+					//Aumenta número biscoitos jogador
+					player->set_eaten_biscuits(player->get_eaten_biscuits() + 1);
+
+					//Altera os valores do mapa
+					g_map->set_map_at(player->get_i(), player->get_j(), '3');
+
+					//verifica super
+					player->fill_super_force();
+
+					//muda direção
+					player->set_direction(player->get_desired_direction());
+
+				}else
+				if(g_map->get_map_at(player->get_i(), player->get_j()) == '7'){
+					//Altera os valores do mapa
+					g_map->set_map_at(player->get_i(), player->get_j(), '3');
+
+					//verifica super
+					player->decrease_super_force();
+
+					//Pega o item
+					player->set_item(7);
+
+					//muda direção
+					player->set_direction(direction);
+
+				}else
+				if(g_map->get_map_at(player->get_i(), player->get_j()) == '4'){
 					//KILL PAC-MAN
 					//verifica se esta super
 					//Define sprite
 					//seta número de lifes
-				}else
-				if(p_b){ // Colisão com biscoito
-					//Remove Biscuit
-					map<pair<int, int>, char>::iterator it;
-					it = g_map.get_biscuits()->find(b_pos[0]);
-					g_map.get_biscuits()->erase(it);
-
-					//Aumenta número biscoitos jogador
-					player.set_eaten_biscuits(player.get_eaten_biscuits() + 1);
-
-					//Move pac-man [Baixo: +1i]
-					g_map.set_map_at(player.get_i(), player.get_j(), '0');
-					player.set_j(player.get_j() - 1);
-					g_map.set_map_at(player.get_i(), player.get_j(), '3');
-
-					//verifica super
-					player.decrease_super_force();
-
-					//Define sprite
-					if(player.get_sprites_num() == 0){
-						player.set_sprites_num(7);
-					}else
-					if(player.get_sprites_num() == 7){
-						player.set_sprites_num(8);
-					}else
-					if(player.get_sprites_num() == 8){
-						player.set_sprites_num(0);
-					}else{
-						player.set_sprites_num(0);
-					}
-
-					//muda direção
-					player.set_direction(direction);
-
-				}else
-				if(p_s){ //Colisão com super biscoito
-					//Remove Biscuit
-					map<pair<int, int>, char>::iterator it;
-					it = g_map.get_s_biscuits()->find(b_pos[0]);
-					g_map.get_s_biscuits()->erase(it);
-
-					//Aumenta número biscoitos jogador
-					player.set_eaten_biscuits(player.get_eaten_biscuits() + 1);
-
-					//Move pac-man [Baixo: +1 i]
-					g_map.set_map_at(player.get_i(), player.get_j(), '0');
-					player.set_j(player.get_j() - 1);
-					g_map.set_map_at(player.get_i(), player.get_j(), '3');
-
-					//verifica super
-					player.fill_super_force();
-
-					//Define sprite
-					if(player.get_sprites_num() == 0){
-						player.set_sprites_num(7);
-					}else
-					if(player.get_sprites_num() == 7){
-						player.set_sprites_num(8);
-					}else
-					if(player.get_sprites_num() == 8){
-						player.set_sprites_num(0);
-					}else{
-						player.set_sprites_num(0);
-					}
-
-					//muda direção
-					player.set_direction(direction);
-
-				}else
-				if(p_i){
-					//Move pac-man [Baixo: +1i]
-					g_map.set_map_at(player.get_i(), player.get_j(), '0');
-					player.set_j(player.get_j() - 1);
-					g_map.set_map_at(player.get_i(), player.get_j(), '3');
-
-					//verifica super
-					player.decrease_super_force();
-
-					//Define sprite
-					if(player.get_sprites_num() == 0){
-						player.set_sprites_num(7);
-					}else
-					if(player.get_sprites_num() == 7){
-						player.set_sprites_num(8);
-					}else
-					if(player.get_sprites_num() == 8){
-						player.set_sprites_num(0);
-					}else{
-						player.set_sprites_num(0);
-					}
-
-					//Pega o item
-					player.set_item(7);
-
-					//muda direção
-					player.set_direction(direction);
 				}else{
-					//Move pac-man [Baixo: +1i]
-					g_map.set_map_at(player.get_i(), player.get_j(), '0');
-					player.set_j(player.get_j() - 1);
-					g_map.set_map_at(player.get_i(), player.get_j(), '3');
+					//Altera os valores do mapa
+					g_map->set_map_at(player->get_i(), player->get_j(), '3');
 
 					//verifica super
-					player.decrease_super_force();
-
-					//Define sprite
-					if(player.get_sprites_num() == 0){
-						player.set_sprites_num(7);
-					}else
-					if(player.get_sprites_num() == 7){
-						player.set_sprites_num(8);
-					}else
-					if(player.get_sprites_num() == 8){
-						player.set_sprites_num(0);
-					}else{
-						player.set_sprites_num(0);
-					}
+					player->decrease_super_force();
 
 					//muda direção
-					player.set_direction(direction);
+					player->set_direction(direction);
+
+				}
+
+				//Define sprite
+				if(player->get_sprites_num() == 0){
+					player->set_sprites_num(7);
+				}else
+				if(player->get_sprites_num() == 7){
+					player->set_sprites_num(8);
+				}else
+				if(player->get_sprites_num() == 8){
+					player->set_sprites_num(0);
+				}else{
+					player->set_sprites_num(0);
 				}
 
 				return true;
@@ -695,11 +448,10 @@ bool collide(Player& player, Map& g_map, int direction, bool last_try){
 			}else{
 				if(last_try){
 					//Define sprite
-					player.set_sprites_num(8);
+					player->set_sprites_num(8);
 					//Verifica super
-					player.decrease_super_force();
+					player->decrease_super_force();
 				}
-
 				return false;
 			}
 		break;
@@ -725,10 +477,10 @@ void game_server(vector<Socket>* player_scoket){
 	vector<thread*> *threads = new vector<thread*>;
 
 	//Mapa
-	Map g_map(224, 248, "map1_1.txt");
+	Map* g_map = new Map(224, 248, "map1_1.txt");
 
 	//Jogadores
-	vector<Player> players;
+	vector<Player*> players;
 
 	//Mensagens
 	string msg;
@@ -737,8 +489,8 @@ void game_server(vector<Socket>* player_scoket){
 
 	//Guarda características de jogadores
 	for(int i = 0; i < player_scoket->size(); i++){
-		pair<int, int> pos = g_map.get_initial_player_pos()->at(i);
-		Player player(pos.first, pos.second);
+		pair<int, int> pos = g_map->get_initial_player_pos()->at(i);
+		Player* player = new Player(pos.first, pos.second);
 		players.push_back(player);
 	}
 
@@ -755,29 +507,27 @@ void game_server(vector<Socket>* player_scoket){
 	}
 
 	map<pair<int,int>,char>::iterator it;
-	string dir;
-	int fff;
 	while(true){
 		//Para cada jogador, realiza o processamento
 		for(int i = 0; i < players.size(); i++){
 			mt.lock();
 			if(string(buffers->at(i)) == "71"){
-				players.at(i).set_desired_direction(3);
+				players.at(i)->set_desired_direction(3);
 			}else
 			if(string(buffers->at(i)) == "72"){
-				players.at(i).set_desired_direction(2);
+				players.at(i)->set_desired_direction(2);
 			}else
 			if(string(buffers->at(i)) == "73"){
-				players.at(i).set_desired_direction(1);
+				players.at(i)->set_desired_direction(1);
 			}else
 			if(string(buffers->at(i)) == "74"){
-				players.at(i).set_desired_direction(0);
+				players.at(i)->set_desired_direction(0);
 			}
 			mt.unlock();
 
-			switch(players.at(i).get_direction()){
+			switch(players.at(i)->get_direction()){
 				case 0:
-					switch(players.at(i).get_desired_direction()){
+					switch(players.at(i)->get_desired_direction()){
 						case 0:
 							collide(players.at(i), g_map, 0, true);
 						break;
@@ -804,7 +554,7 @@ void game_server(vector<Socket>* player_scoket){
 
 				//############################## 1 #################################
 				case 1:
-					switch(players.at(i).get_desired_direction()){
+					switch(players.at(i)->get_desired_direction()){
 						case 0:
 							if(!collide(players.at(i), g_map, 0, false)){
 								collide(players.at(i), g_map, 1, true);
@@ -830,7 +580,7 @@ void game_server(vector<Socket>* player_scoket){
 				break;
 
 				case 2:
-					switch(players.at(i).get_desired_direction()){
+					switch(players.at(i)->get_desired_direction()){
 						case 0:
 							if(!collide(players.at(i), g_map, 0, false)){
 								collide(players.at(i), g_map, 2, true);
@@ -856,7 +606,7 @@ void game_server(vector<Socket>* player_scoket){
 				break;
 
 				case 3:
-					switch(players.at(i).get_desired_direction()){
+					switch(players.at(i)->get_desired_direction()){
 						case 0:
 							if(!collide(players.at(i), g_map, 0, false)){
 								collide(players.at(i), g_map, 3, true);
@@ -886,11 +636,11 @@ void game_server(vector<Socket>* player_scoket){
 		//Mensagem já pode ser gerada
 		//Envia os biscuits e super biscuits
 		msg = "";
-		for(it = g_map.get_biscuits()->begin(); it != g_map.get_biscuits()->end(); it++){
+		for(it = g_map->get_biscuits()->begin(); it != g_map->get_biscuits()->end(); it++){
 			msg += string(to_string(it->first.first) + "x" + to_string(it->first.second) + ";");
 		}
 
-		for(it = g_map.get_s_biscuits()->begin(); it != g_map.get_s_biscuits()->end(); it++){
+		for(it = g_map->get_s_biscuits()->begin(); it != g_map->get_s_biscuits()->end(); it++){
 			msg += string("S" + to_string(it->first.first) + "x" + to_string(it->first.second) + ";");
 		}
 
@@ -904,8 +654,10 @@ void game_server(vector<Socket>* player_scoket){
 		//Envia atributos de clientes
 		msg = "";
 		for(int i = 0; i < players.size(); i++){
-			msg += string(to_string(players.at(i).get_i()) + "|" + to_string(players.at(i).get_j()) + "|" +
-				to_string(players.at(i).get_sprites_num()) + "|;");
+			msg += string(to_string(players.at(i)->get_i()) + "|" + to_string(players.at(i)->get_j()) + "|" +
+			to_string(players.at(i)->get_sprites_num()) + "|" + to_string(players.at(i)->get_lifes()) + "|" +
+			to_string(/*players.at(i)->get_sound_num()*/0) + "|" + to_string(players.at(i)->get_eaten_biscuits()) +
+			 "|" + to_string(players.at(i)->get_item()) + "|;");
 		}
 
 		memset(buffer_info, '\0', 2048);
@@ -915,7 +667,9 @@ void game_server(vector<Socket>* player_scoket){
 			player_scoket->at(i).send(1, buffer_info, 2048);
 		}
 
-		this_thread::sleep_for(chrono::milliseconds(50));
+		//Enviar atributos dos fantasmas
+
+		this_thread::sleep_for(chrono::milliseconds(20));
 	}
 
 }

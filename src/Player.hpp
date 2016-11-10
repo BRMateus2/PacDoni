@@ -11,6 +11,8 @@ private:
 	int* sprite_num;
 	int* lifes;
 	int* item;
+	int* sound_num;
+	int* wait_time;
 
 public:
 	Player(int i, int j);
@@ -44,4 +46,11 @@ public:
 
 	void set_item(int item);
 	int get_item();
+
+	void set_sound_num(int sound_num);
+	int get_sound_num();
+
+	void decrease_wait_time();
+	void fill_wait_time();
+	int get_time_wait();
 };

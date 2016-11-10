@@ -10,6 +10,8 @@ Player::Player(int i, int j){
 	this->sprite_num = new int(0);
 	this->lifes = new int(4);
 	this->item = new int(0);
+	this->sound_num = new int(0);
+	this->wait_time = new int(0);
 }
 
 Player::~Player(){
@@ -22,6 +24,8 @@ Player::~Player(){
 	delete sprite_num;
 	delete lifes;
 	delete item;
+	delete sound_num;
+	delete wait_time;
 }
 
 Player::Player(const Player& p){
@@ -34,6 +38,8 @@ Player::Player(const Player& p){
 	this->sprite_num = new int(*(p.sprite_num));
 	this->lifes = new int(*(p.lifes));
 	this->item = new int(*(p.item));
+	this->sound_num = new int(*(p.sound_num));
+	this->wait_time = new int(*(p.wait_time));
 }
 
 void Player::set_i(int i){
@@ -113,4 +119,27 @@ void Player::set_item(int item){
 
 int Player::get_item(){
 	return *(this->item);
+}
+
+void Player::set_sound_num(int sound_num){
+	*(this->sound_num) = sound_num;
+}
+
+int Player::get_sound_num(){
+	return *(this->sound_num);
+}
+
+void Player::decrease_wait_time(){
+	if(*wait_time > 0){
+		*wait_time--;
+	}
+}
+
+void Player::fill_wait_time(){
+	*(this->wait_time) = 100;
+}
+
+
+int Player::get_time_wait(){
+	return *(this->wait_time);
 }
