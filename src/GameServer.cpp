@@ -8,6 +8,7 @@
 #include "Map.hpp"
 #include "Socket.hpp"
 #include "Player.hpp"
+#include "Ghost.hpp"
 
 using namespace std;
 
@@ -459,6 +460,15 @@ bool collide(Player* player, Map* g_map, int direction, bool last_try){
 }
 
 
+void move_ghost(Map* g_map, Ghost* g){
+	int u, r, d, l;
+	u = (g->get_i() - 48) > 0 ? (g->get_i() - 48) : 0;
+	d = (g->get_i() + 48) < 248 ? (g->get_i() - 48) : 248;
+
+	l = (g->get_j() - 48) > 0 ? (g->get_j() - 48) : 0;
+	r = (g->get_i() + 48) < 248 ? (g->get_i() - 48) : 248;
+}
+
 //Manipula o vetor de string para cada player
 void player_handler(Socket player_scoket, int player_id, vector<char*>* buffer){
 	cout << "Thread Iniciada: Player " << player_id << endl;
@@ -482,6 +492,9 @@ void game_server(vector<Socket>* player_scoket){
 	//Jogadores
 	vector<Player*> players;
 
+	//Fantasmas
+	vector<Ghost*> ghosts;
+
 	//Mensagens
 	string msg;
 	char* buffer_dots = new char[2048];
@@ -493,6 +506,15 @@ void game_server(vector<Socket>* player_scoket){
 		Player* player = new Player(pos.first, pos.second);
 		players.push_back(player);
 	}
+
+	//Guarda características dos fantas
+	for(int i = 0; i < g_map->get_initial_ghost_pos()->size(); i++){
+		pair<int, int> pos = g_map->get_initial_ghost_pos()->at(i);
+		Ghost* ghost = new Ghost(pos.first, pos.second);
+		ghosts.push_back(ghost);
+	}
+
+	ghosts.at(0)->reset_wait_time();
 
 	//Cria um buffer pra cada player
 	for(int i = 0; i < player_scoket->size(); i++){
@@ -507,7 +529,7 @@ void game_server(vector<Socket>* player_scoket){
 	}
 
 	map<pair<int,int>,char>::iterator it;
-	while(true){
+	while(/*g_map->get_biscuits()->size() != 0*/true){
 		//Para cada jogador, realiza o processamento
 		for(int i = 0; i < players.size(); i++){
 			mt.lock();
@@ -525,111 +547,113 @@ void game_server(vector<Socket>* player_scoket){
 			}
 			mt.unlock();
 
-			switch(players.at(i)->get_direction()){
-				case 0:
-					switch(players.at(i)->get_desired_direction()){
-						case 0:
-							collide(players.at(i), g_map, 0, true);
-						break;
-
-						case 1:
-							if(!collide(players.at(i), g_map, 1, false)){
+			if(players.at(i)->get_lifes() != 0){
+				switch(players.at(i)->get_direction()){
+					case 0:
+						switch(players.at(i)->get_desired_direction()){
+							case 0:
 								collide(players.at(i), g_map, 0, true);
-							}
-						break;
+							break;
 
-						case 2:
-							if(!collide(players.at(i), g_map, 2, false)){
-								collide(players.at(i), g_map, 0, true);
-							}
-						break;
+							case 1:
+								if(!collide(players.at(i), g_map, 1, false)){
+									collide(players.at(i), g_map, 0, true);
+								}
+							break;
 
-						case 3:
-							if(!collide(players.at(i), g_map, 3, false)){
-								collide(players.at(i), g_map, 0, true);
-							}
-						break;
-					}
-				break;
+							case 2:
+								if(!collide(players.at(i), g_map, 2, false)){
+									collide(players.at(i), g_map, 0, true);
+								}
+							break;
 
-				//############################## 1 #################################
-				case 1:
-					switch(players.at(i)->get_desired_direction()){
-						case 0:
-							if(!collide(players.at(i), g_map, 0, false)){
+							case 3:
+								if(!collide(players.at(i), g_map, 3, false)){
+									collide(players.at(i), g_map, 0, true);
+								}
+							break;
+						}
+					break;
+
+					//############################## 1 #################################
+					case 1:
+						switch(players.at(i)->get_desired_direction()){
+							case 0:
+								if(!collide(players.at(i), g_map, 0, false)){
+									collide(players.at(i), g_map, 1, true);
+								}
+							break;
+
+							case 1:
 								collide(players.at(i), g_map, 1, true);
-							}
-						break;
+							break;
 
-						case 1:
-							collide(players.at(i), g_map, 1, true);
-						break;
+							case 2:
+								if(!collide(players.at(i), g_map, 2, false)){
+									collide(players.at(i), g_map, 1, true);
+								}
+							break;
 
-						case 2:
-							if(!collide(players.at(i), g_map, 2, false)){
-								collide(players.at(i), g_map, 1, true);
-							}
-						break;
+							case 3:
+								if(!collide(players.at(i), g_map, 3, false)){
+									collide(players.at(i), g_map, 1, true);
+								}
+							break;
+						}
+					break;
 
-						case 3:
-							if(!collide(players.at(i), g_map, 3, false)){
-								collide(players.at(i), g_map, 1, true);
-							}
-						break;
-					}
-				break;
+					case 2:
+						switch(players.at(i)->get_desired_direction()){
+							case 0:
+								if(!collide(players.at(i), g_map, 0, false)){
+									collide(players.at(i), g_map, 2, true);
+								}
+							break;
 
-				case 2:
-					switch(players.at(i)->get_desired_direction()){
-						case 0:
-							if(!collide(players.at(i), g_map, 0, false)){
+							case 1:
+								if(!collide(players.at(i), g_map, 1, false)){
+									collide(players.at(i), g_map, 2, true);
+								}
+							break;
+
+							case 2:
 								collide(players.at(i), g_map, 2, true);
-							}
-						break;
+							break;
 
-						case 1:
-							if(!collide(players.at(i), g_map, 1, false)){
-								collide(players.at(i), g_map, 2, true);
-							}
-						break;
+							case 3:
+								if(!collide(players.at(i), g_map, 3, false)){
+									collide(players.at(i), g_map, 2, true);
+								}
+							break;
+						}
+					break;
 
-						case 2:
-							collide(players.at(i), g_map, 2, true);
-						break;
+					case 3:
+						switch(players.at(i)->get_desired_direction()){
+							case 0:
+								if(!collide(players.at(i), g_map, 0, false)){
+									collide(players.at(i), g_map, 3, true);
+								}
+							break;
 
-						case 3:
-							if(!collide(players.at(i), g_map, 3, false)){
-								collide(players.at(i), g_map, 2, true);
-							}
-						break;
-					}
-				break;
+							case 1:
+								if(!collide(players.at(i), g_map, 1, false)){
+									collide(players.at(i), g_map, 3, true);
+								}
+							break;
 
-				case 3:
-					switch(players.at(i)->get_desired_direction()){
-						case 0:
-							if(!collide(players.at(i), g_map, 0, false)){
+							case 2:
+								if(!collide(players.at(i), g_map, 2, false)){
+									collide(players.at(i), g_map, 3, true);
+								}
+							break;
+
+							case 3:
 								collide(players.at(i), g_map, 3, true);
-							}
-						break;
-
-						case 1:
-							if(!collide(players.at(i), g_map, 1, false)){
-								collide(players.at(i), g_map, 3, true);
-							}
-						break;
-
-						case 2:
-							if(!collide(players.at(i), g_map, 2, false)){
-								collide(players.at(i), g_map, 3, true);
-							}
-						break;
-
-						case 3:
-							collide(players.at(i), g_map, 3, true);
-						break;
-					}
-				break;
+							break;
+						}
+					break;
+				}
 			}
 		}
 
@@ -656,8 +680,9 @@ void game_server(vector<Socket>* player_scoket){
 		for(int i = 0; i < players.size(); i++){
 			msg += string(to_string(players.at(i)->get_i()) + "|" + to_string(players.at(i)->get_j()) + "|" +
 			to_string(players.at(i)->get_sprites_num()) + "|" + to_string(players.at(i)->get_lifes()) + "|" +
-			to_string(/*players.at(i)->get_sound_num()*/0) + "|" + to_string(players.at(i)->get_eaten_biscuits()) +
-			 "|" + to_string(players.at(i)->get_item()) + "|;");
+			to_string(/*players.at(i)->get_sound_num()*/0) + "|" +
+			to_string(players.at(i)->get_eaten_biscuits()) + "|" +
+			to_string(players.at(i)->get_item()) + "|;");
 		}
 
 		memset(buffer_info, '\0', 2048);
@@ -668,6 +693,19 @@ void game_server(vector<Socket>* player_scoket){
 		}
 
 		//Enviar atributos dos fantasmas
+		msg = "";
+		for(int i = 0; i < ghosts.size(); i++){
+			msg += string(to_string(ghosts.at(i)->get_i()) + "|" +
+			to_string(ghosts.at(i)->get_j()) + "|" +
+			to_string(ghosts.at(i)->get_sprites_num()) + "|;");
+		}
+
+		memset(buffer_info, '\0', 2048);
+		msg.copy(buffer_info, 2048, 0);
+
+		for(int i = 0; i < player_scoket->size(); i++){
+			player_scoket->at(i).send(1, buffer_info, 2048);
+		}
 
 		this_thread::sleep_for(chrono::milliseconds(20));
 	}

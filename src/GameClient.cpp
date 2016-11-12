@@ -10,6 +10,7 @@
 #include <utility>
 #include "Socket.hpp"
 #include "Player.hpp"
+#include "Ghost.hpp"
 
 using namespace std;
 using namespace sf;
@@ -26,7 +27,7 @@ void thread_snd(Socket client_game, bool* has_finish, RenderWindow* window){
 	Event event;
 //	this_thread::sleep_for(chrono::milliseconds(1000));
 
-	while (true){
+	while (window->isOpen()){
 		while (window->pollEvent(event)){
 			if (event.type == Event::KeyPressed){
 				memset(buffer, '\0', 10);
@@ -59,6 +60,7 @@ void thread_rcv(Socket client_game, bool* has_finish){
 	vector<pair<int,int>> biscuits;
 	vector<pair<int,int>> s_biscuits;
 	vector<Player> players;
+	vector<Ghost> ghosts;
 	vector<string> pl_info;
 	vector<int> info;
 	pair<int, int> b_pos;
@@ -270,6 +272,87 @@ void thread_rcv(Socket client_game, bool* has_finish){
 	numbers_texture[8].loadFromFile("../res/sprites/num_8.png");
 	numbers_texture[9].loadFromFile("../res/sprites/num_9.png");
 
+	Texture ghost_texture[19][4];
+	ghost_texture[0][0].loadFromFile("../res/sprites/ghost_red_u_1.png");
+	ghost_texture[1][0].loadFromFile("../res/sprites/ghost_red_u_2.png");
+	ghost_texture[2][0].loadFromFile("../res/sprites/ghost_red_d_1.png");
+	ghost_texture[3][0].loadFromFile("../res/sprites/ghost_red_d_2.png");
+	ghost_texture[4][0].loadFromFile("../res/sprites/ghost_red_l_1.png");
+	ghost_texture[5][0].loadFromFile("../res/sprites/ghost_red_l_2.png");
+	ghost_texture[6][0].loadFromFile("../res/sprites/ghost_red_r_1.png");
+	ghost_texture[7][0].loadFromFile("../res/sprites/ghost_red_r_2.png");
+	ghost_texture[8][0].loadFromFile("../res/sprites/ghost_red_b_1.png");
+	ghost_texture[9][0].loadFromFile("../res/sprites/ghost_red_b_2.png");
+	ghost_texture[10][0].loadFromFile("../res/sprites/ghost_red_b_3.png");
+	ghost_texture[11][0].loadFromFile("../res/sprites/ghost_s_1_1.png");
+	ghost_texture[12][0].loadFromFile("../res/sprites/ghost_s_1_2.png");
+	ghost_texture[13][0].loadFromFile("../res/sprites/ghost_s_2_1.png");
+	ghost_texture[14][0].loadFromFile("../res/sprites/ghost_s_2_2.png");
+	ghost_texture[15][0].loadFromFile("../res/sprites/ghost_k_d.png");
+	ghost_texture[16][0].loadFromFile("../res/sprites/ghost_k_l.png");
+	ghost_texture[17][0].loadFromFile("../res/sprites/ghost_k_r.png");
+	ghost_texture[18][0].loadFromFile("../res/sprites/ghost_k_u.png");
+
+	ghost_texture[0][1].loadFromFile("../res/sprites/ghost_blue_u_1.png");
+	ghost_texture[1][1].loadFromFile("../res/sprites/ghost_blue_u_2.png");
+	ghost_texture[2][1].loadFromFile("../res/sprites/ghost_blue_d_1.png");
+	ghost_texture[3][1].loadFromFile("../res/sprites/ghost_blue_d_2.png");
+	ghost_texture[4][1].loadFromFile("../res/sprites/ghost_blue_l_1.png");
+	ghost_texture[5][1].loadFromFile("../res/sprites/ghost_blue_l_2.png");
+	ghost_texture[6][1].loadFromFile("../res/sprites/ghost_blue_r_1.png");
+	ghost_texture[7][1].loadFromFile("../res/sprites/ghost_blue_r_2.png");
+	ghost_texture[8][1].loadFromFile("../res/sprites/ghost_blue_b_1.png");
+	ghost_texture[9][1].loadFromFile("../res/sprites/ghost_blue_b_2.png");
+	ghost_texture[10][1].loadFromFile("../res/sprites/ghost_blue_b_3.png");
+	ghost_texture[11][1].loadFromFile("../res/sprites/ghost_s_1_1.png");
+	ghost_texture[12][1].loadFromFile("../res/sprites/ghost_s_1_2.png");
+	ghost_texture[13][1].loadFromFile("../res/sprites/ghost_s_2_1.png");
+	ghost_texture[14][1].loadFromFile("../res/sprites/ghost_s_2_2.png");
+	ghost_texture[15][1].loadFromFile("../res/sprites/ghost_k_d.png");
+	ghost_texture[16][1].loadFromFile("../res/sprites/ghost_k_l.png");
+	ghost_texture[17][1].loadFromFile("../res/sprites/ghost_k_r.png");
+	ghost_texture[18][1].loadFromFile("../res/sprites/ghost_k_u.png");
+
+	ghost_texture[0][2].loadFromFile("../res/sprites/ghost_pink_u_1.png");
+	ghost_texture[1][2].loadFromFile("../res/sprites/ghost_pink_u_2.png");
+	ghost_texture[2][2].loadFromFile("../res/sprites/ghost_pink_d_1.png");
+	ghost_texture[3][2].loadFromFile("../res/sprites/ghost_pink_d_2.png");
+	ghost_texture[4][2].loadFromFile("../res/sprites/ghost_pink_l_1.png");
+	ghost_texture[5][2].loadFromFile("../res/sprites/ghost_pink_l_2.png");
+	ghost_texture[6][2].loadFromFile("../res/sprites/ghost_pink_r_1.png");
+	ghost_texture[7][2].loadFromFile("../res/sprites/ghost_pink_r_2.png");
+	ghost_texture[8][2].loadFromFile("../res/sprites/ghost_pink_b_1.png");
+	ghost_texture[9][2].loadFromFile("../res/sprites/ghost_pink_b_2.png");
+	ghost_texture[10][2].loadFromFile("../res/sprites/ghost_pink_b_3.png");
+	ghost_texture[11][2].loadFromFile("../res/sprites/ghost_s_1_1.png");
+	ghost_texture[12][2].loadFromFile("../res/sprites/ghost_s_1_2.png");
+	ghost_texture[13][2].loadFromFile("../res/sprites/ghost_s_2_1.png");
+	ghost_texture[14][2].loadFromFile("../res/sprites/ghost_s_2_2.png");
+	ghost_texture[15][2].loadFromFile("../res/sprites/ghost_k_d.png");
+	ghost_texture[16][2].loadFromFile("../res/sprites/ghost_k_l.png");
+	ghost_texture[17][2].loadFromFile("../res/sprites/ghost_k_r.png");
+	ghost_texture[18][2].loadFromFile("../res/sprites/ghost_k_u.png");
+
+	ghost_texture[0][3].loadFromFile("../res/sprites/ghost_yellow_u_1.png");
+	ghost_texture[1][3].loadFromFile("../res/sprites/ghost_yellow_u_2.png");
+	ghost_texture[2][3].loadFromFile("../res/sprites/ghost_yellow_d_1.png");
+	ghost_texture[3][3].loadFromFile("../res/sprites/ghost_yellow_d_2.png");
+	ghost_texture[4][3].loadFromFile("../res/sprites/ghost_yellow_l_1.png");
+	ghost_texture[5][3].loadFromFile("../res/sprites/ghost_yellow_l_2.png");
+	ghost_texture[6][3].loadFromFile("../res/sprites/ghost_yellow_r_1.png");
+	ghost_texture[7][3].loadFromFile("../res/sprites/ghost_yellow_r_2.png");
+	ghost_texture[8][3].loadFromFile("../res/sprites/ghost_yellow_b_1.png");
+	ghost_texture[9][3].loadFromFile("../res/sprites/ghost_yellow_b_2.png");
+	ghost_texture[10][3].loadFromFile("../res/sprites/ghost_yellow_b_3.png");
+	ghost_texture[11][3].loadFromFile("../res/sprites/ghost_s_1_1.png");
+	ghost_texture[12][3].loadFromFile("../res/sprites/ghost_s_1_2.png");
+	ghost_texture[13][3].loadFromFile("../res/sprites/ghost_s_2_1.png");
+	ghost_texture[14][3].loadFromFile("../res/sprites/ghost_s_2_2.png");
+	ghost_texture[15][3].loadFromFile("../res/sprites/ghost_k_d.png");
+	ghost_texture[16][3].loadFromFile("../res/sprites/ghost_k_l.png");
+	ghost_texture[17][3].loadFromFile("../res/sprites/ghost_k_r.png");
+	ghost_texture[18][3].loadFromFile("../res/sprites/ghost_k_u.png");
+
 	Texture letter_texture;
 	letter_texture.loadFromFile("../res/sprites/letter_X.png");
 
@@ -303,11 +386,19 @@ void thread_rcv(Socket client_game, bool* has_finish){
 		numbers[i].setTexture(numbers_texture[i]);
 	}
 
+	Sprite ghost[19][4];
+	for(int i = 0; i < 21; i++){
+		for(int j = 0; j < 4; j++){
+			ghost[i][j].setTexture(ghost_texture[i][j]);
+		}
+	}
+
 	Sprite letter;
 	letter.setTexture(letter_texture);
 
 	while (window->isOpen()){
 
+		//BISCUITS
 		memset(buffer, '\0', 2048);
 		client_game.recv(0, buffer, 2048);
 		msg = string(buffer);
@@ -335,7 +426,7 @@ void thread_rcv(Socket client_game, bool* has_finish){
 			apos = pos + 1;
 		}
 
-
+		//JOGADOR
 		memset(buffer, '\0', 2048);
 		client_game.recv(0, buffer, 2048);
 		msg = string(buffer);
@@ -373,6 +464,40 @@ void thread_rcv(Socket client_game, bool* has_finish){
 			players.push_back(p);
 		}
 
+		//FANTASMAS
+		memset(buffer, '\0', 2048);
+		client_game.recv(0, buffer, 2048);
+		msg = string(buffer);
+
+		//Quebra a mensegem para encontrar todos os pontos
+		apos = 0;
+		pl_info.clear();
+		ghosts.clear();
+
+		while(apos < msg.size()){
+			pos = msg.find(';', apos);
+			word = msg.substr(apos, pos - apos);
+			pl_info.push_back(word);
+			apos = pos + 1;
+		}
+
+		for(int i = 0; i < pl_info.size(); i++){
+			apos = 0;
+			info.clear();
+
+			while(apos < pl_info.at(i).size()){
+				pos = pl_info.at(i).find('|', apos);
+				word = pl_info.at(i).substr(apos, pos - apos);
+				info.push_back(stoi(word));
+				apos = pos + 1;
+			}
+
+			Ghost g(info.at(0), info.at(1));
+			g.set_sprites_num(info.at(2));
+
+			ghosts.push_back(g);
+		}
+
         window->clear();
 
 		//Drawn here
@@ -397,6 +522,13 @@ void thread_rcv(Socket client_game, bool* has_finish){
 			pac[players.at(i).get_sprites_num()][i].setPosition(players.at(i).get_j()
 				+ 150, players.at(i).get_i() + 26);
 			window->draw(pac[players.at(i).get_sprites_num()][i]);
+		}
+
+		//Desenha ghost
+		for(int i = 0; i < ghosts.size(); i++){
+			ghost[ghosts.at(i).get_sprites_num()][i].setPosition(ghosts.at(i).get_j()
+				+ 150, ghosts.at(i).get_i() + 26);
+			window->draw(ghost[ghosts.at(i).get_sprites_num()][i]);
 		}
 
 		//Desenha informações (Sprite jogador)
@@ -459,6 +591,7 @@ void thread_rcv(Socket client_game, bool* has_finish){
 
         window->display();
     }
+	send->join();
 }
 
 int main(int argc, char **argv){
