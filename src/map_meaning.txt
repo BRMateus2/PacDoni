@@ -1,8 +1,0 @@
-0 - mapa
-1 - parede
-2 - barra
-3 - player
-4 - ghost
-5 - biscuit
-6 - super_biscuit
-7 - item

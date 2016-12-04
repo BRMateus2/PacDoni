@@ -14,7 +14,6 @@ private:
 	map<pair<int,int>, char>* biscuits;
 	map<pair<int,int>, char>* s_biscuits;
 	vector<pair<int,int>>* initial_player_pos;
-	vector<pair<int,int>>* initial_ghost_pos;
 
 public:
 	Map(int width, int height);
@@ -32,5 +31,4 @@ public:
 	map<pair<int,int>, char>* get_biscuits();
 	map<pair<int,int>, char>* get_s_biscuits();
 	vector<pair<int,int>>* get_initial_player_pos();
-	vector<pair<int,int>>* get_initial_ghost_pos();
 };

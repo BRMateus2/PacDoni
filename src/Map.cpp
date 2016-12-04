@@ -13,7 +13,6 @@ Map::Map(int width, int height){
 	this->biscuits = new map<pair<int,int>, char>;
 	this->s_biscuits = new map<pair<int,int>, char>;
 	this->initial_player_pos = new vector<pair<int,int>>;
-	this->initial_ghost_pos = new vector<pair<int,int>>;
 }
 
 Map::Map(int width, int height, string map_name){
@@ -29,7 +28,6 @@ Map::Map(int width, int height, string map_name){
 	this->biscuits = new map<pair<int,int>, char>;
 	this->s_biscuits = new map<pair<int,int>, char>;
 	this->initial_player_pos = new vector<pair<int,int>>;
-	this->initial_ghost_pos = new vector<pair<int,int>>;
 
 	ifstream loader(map_name.c_str());
 
@@ -47,10 +45,6 @@ Map::Map(int width, int height, string map_name){
 			if(game_map[i][j] == '3'){
 				pair<int, int> b_pos(i,j);
 				initial_player_pos->push_back(b_pos);
-			}else
-			if(game_map[i][j] == '4'){
-				pair<int, int> b_pos(i,j);
-				initial_ghost_pos->push_back(b_pos);
 			}
 		}
 	}
@@ -64,7 +58,6 @@ Map::Map(const Map& g_map){
 	this->s_biscuits = new map<pair<int,int>, char>(*(g_map.s_biscuits));
 
 	this->initial_player_pos = new vector<pair<int,int>>(*(g_map.initial_player_pos));
-	this->initial_ghost_pos = new vector<pair<int,int>>(*(g_map.initial_ghost_pos));
 
 	game_map = new char*[*height];
 	for(int i = 0; i < *height; i++){
@@ -89,14 +82,12 @@ Map::~Map(){
 	delete biscuits;
 	delete s_biscuits;
 	delete initial_player_pos;
-	delete initial_ghost_pos;
 }
 
 bool Map::load(string map_name){
 	biscuits->clear();
 	s_biscuits->clear();
 	initial_player_pos->clear();
-	initial_ghost_pos->clear();
 
 	ifstream loader(map_name.c_str());
 
@@ -115,10 +106,6 @@ bool Map::load(string map_name){
 			if(game_map[i][j] == '3'){
 				pair<int, int> b_pos(i,j);
 				initial_player_pos->push_back(b_pos);
-			}else
-			if(game_map[i][j] == '4'){
-				pair<int, int> b_pos(i,j);
-				initial_ghost_pos->push_back(b_pos);
 			}
 		}
 	}
@@ -158,8 +145,4 @@ map<pair<int,int>, char>* Map::get_s_biscuits(){
 
 vector<pair<int,int>>* Map::get_initial_player_pos(){
 	return initial_player_pos;
-}
-
-vector<pair<int,int>>* Map::get_initial_ghost_pos(){
-	return initial_ghost_pos;
 }

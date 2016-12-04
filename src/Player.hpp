@@ -4,6 +4,7 @@ class Player{
 private:
 	int* i;
 	int* j;
+	int* id;
 	int* super_force;
 	int* eaten_biscuits;
 	int* direction;
@@ -15,7 +16,7 @@ private:
 	int* wait_time;
 
 public:
-	Player(int i, int j);
+	Player(int i, int j, int id);
 	Player(const Player& p);
 	~Player();
 
@@ -24,6 +25,9 @@ public:
 
 	void set_j(int j);
 	int get_j();
+
+	void set_id(int id);
+	int get_id();
 
 	int get_super_force();
 	void decrease_super_force();

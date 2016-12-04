@@ -33,9 +33,6 @@ int main(int argc, char** argv){
 			if(color.r == 255 && color.g == 255 && color.b == 0){
 				map_1 << "3 ";
 			}else
-			if(color.r == 0 && color.g == 255 && color.b == 0){
-				map_1 << "4 ";
-			}else
 			if(color.r == 255 && color.g == 255 && color.b == 255){
 				map_1 << "5 ";
 			}else

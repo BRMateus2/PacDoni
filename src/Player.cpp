@@ -1,8 +1,9 @@
 #include "Player.hpp"
 
-Player::Player(int i, int j){
+Player::Player(int i, int j, int id){
 	this->i = new int(i);
 	this->j = new int(j);
+	this->id = new int(id);
 	this->super_force = new int(0);
 	this->eaten_biscuits = new int(0);
 	this->direction = new int(3);
@@ -14,9 +15,25 @@ Player::Player(int i, int j){
 	this->wait_time = new int(0);
 }
 
+Player::Player(const Player& p){
+	this->i = new int(*(p.i));
+	this->j = new int(*(p.j));
+	this->id = new int(*(p.id));
+	this->super_force = new int(*(p.super_force));
+	this->eaten_biscuits = new int(*(p.eaten_biscuits));
+	this->direction = new int(*(p.direction));
+	this->desired_direction = new int(*(p.desired_direction));
+	this->sprite_num = new int(*(p.sprite_num));
+	this->lifes = new int(*(p.lifes));
+	this->item = new int(*(p.item));
+	this->sound_num = new int(*(p.sound_num));
+	this->wait_time = new int(*(p.wait_time));
+}
+
 Player::~Player(){
 	delete i;
 	delete j;
+	delete id;
 	delete super_force;
 	delete eaten_biscuits;
 	delete direction;
@@ -28,19 +45,6 @@ Player::~Player(){
 	delete wait_time;
 }
 
-Player::Player(const Player& p){
-	this->i = new int(*(p.i));
-	this->j = new int(*(p.j));
-	this->super_force = new int(*(p.super_force));
-	this->eaten_biscuits = new int(*(p.eaten_biscuits));
-	this->direction = new int(*(p.direction));
-	this->desired_direction = new int(*(p.desired_direction));
-	this->sprite_num = new int(*(p.sprite_num));
-	this->lifes = new int(*(p.lifes));
-	this->item = new int(*(p.item));
-	this->sound_num = new int(*(p.sound_num));
-	this->wait_time = new int(*(p.wait_time));
-}
 
 void Player::set_i(int i){
 	*(this->i) = i;
@@ -58,18 +62,26 @@ int Player::get_j(){
 	return *(this->j);
 }
 
+void Player::set_id(int id){
+	*(this->id) = id;
+}
+
+int Player::get_id(){
+	return *(this->id);
+}
+
 int Player::get_super_force(){
 	return *super_force;
 }
 
 void Player::decrease_super_force(){
-	if(*super_force > 0){
-		*(super_force)--;
+	if(*(super_force) > 0){
+		*(super_force) -= 1;
 	}
 }
 
 void Player::fill_super_force(){
-	*super_force = 20;
+	*super_force = 1000;
 }
 
 
@@ -131,7 +143,7 @@ int Player::get_sound_num(){
 
 void Player::decrease_wait_time(){
 	if(*wait_time > 0){
-		*wait_time--;
+		*(wait_time) -= 1;
 	}
 }
 
