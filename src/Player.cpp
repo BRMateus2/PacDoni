@@ -71,7 +71,11 @@ int Player::get_id(){
 }
 
 int Player::get_super_force(){
-	return *super_force;
+	return *(this->super_force);
+}
+
+void Player::set_super_force(int super_force){
+	*(this->super_force) = super_force;
 }
 
 void Player::decrease_super_force(){
@@ -81,7 +85,7 @@ void Player::decrease_super_force(){
 }
 
 void Player::fill_super_force(){
-	*super_force = 1000;
+	*(this->super_force) = 700;
 }
 
 

@@ -959,7 +959,7 @@ void game_server(vector<Socket>* player_scoket){
 				msg += string(to_string(players.at(i)->get_i()) + "|" + to_string(players.at(i)->get_j()) + "|" +
 				to_string(players.at(i)->get_sprites_num()) + "|" + to_string(players.at(i)->get_lifes()) + "|" +
 				to_string(players.at(i)->get_sound_num()) + "|" + to_string(players.at(i)->get_eaten_biscuits()) + "|" +
-				to_string(players.at(i)->get_item()) + "|;");
+				to_string(players.at(i)->get_item()) + "|" + to_string(players.at(i)->get_super_force()) + "|;");
 			}
 
 
@@ -1039,13 +1039,6 @@ void players_receptionist(string ip, int port, int num_players){
 
 		thread* new_game_server = new thread(game_server, players);
 		//threads.push_back(new_game_server);
-
-		/*for(int i = 0; i < threads.size(); i++){
-			if(threads.at(i)->joinable()){
-				threads.at(i)->join();
-				threads.erase(threads.begin() + i);
-			}
-		}*/
 	}
 }
 

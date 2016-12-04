@@ -30,6 +30,7 @@ public:
 	int get_id();
 
 	int get_super_force();
+	void set_super_force(int super_force);
 	void decrease_super_force();
 	void fill_super_force();
 

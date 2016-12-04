@@ -70,7 +70,7 @@ void thread_snd(Socket client_game, bool* has_finish, RenderWindow* window){
 void thread_rcv(Socket client_game, bool* has_finish){
 
 	//Abre a janela do jogo
-	RenderWindow* window = new RenderWindow(VideoMode(400, 300), "Pac-Doni");
+	RenderWindow* window = new RenderWindow(VideoMode(400, 300), "Pac-Doni - UFSJ");
 
 	//Inicia a thread de controle de teclas
 	thread* send = new thread(thread_snd, client_game, has_finish, window);
@@ -137,7 +137,7 @@ void thread_rcv(Socket client_game, bool* has_finish){
 	state_texture[8].loadFromFile("../res/sprites/state_8.png");
 	state_texture[8].setSmooth(false);
 
-	Texture pac_texture[21][4];
+	Texture pac_texture[22][4];
 	pac_texture[0][0].loadFromFile("../res/sprites/pac_1_1.png");
 	pac_texture[0][0].setSmooth(false);
 	pac_texture[1][0].loadFromFile("../res/sprites/pac_1_d_1.png");
@@ -180,6 +180,8 @@ void thread_rcv(Socket client_game, bool* has_finish){
 	pac_texture[19][0].setSmooth(false);
 	pac_texture[20][0].loadFromFile("../res/sprites/pac_1_k_12.png");
 	pac_texture[20][0].setSmooth(false);
+	pac_texture[21][0].loadFromFile("../res/sprites/pac_1_r_1b.png");
+	pac_texture[21][0].setSmooth(false);
 
 	pac_texture[0][1].loadFromFile("../res/sprites/pac_2_1.png");
 	pac_texture[0][1].setSmooth(false);
@@ -223,6 +225,8 @@ void thread_rcv(Socket client_game, bool* has_finish){
 	pac_texture[19][1].setSmooth(false);
 	pac_texture[20][1].loadFromFile("../res/sprites/pac_2_k_12.png");
 	pac_texture[20][1].setSmooth(false);
+	pac_texture[21][1].loadFromFile("../res/sprites/pac_2_r_1b.png");
+	pac_texture[21][1].setSmooth(false);
 
 	pac_texture[0][2].loadFromFile("../res/sprites/pac_3_1.png");
 	pac_texture[0][2].setSmooth(false);
@@ -266,6 +270,8 @@ void thread_rcv(Socket client_game, bool* has_finish){
 	pac_texture[19][2].setSmooth(false);
 	pac_texture[20][2].loadFromFile("../res/sprites/pac_3_k_12.png");
 	pac_texture[20][2].setSmooth(false);
+	pac_texture[21][2].loadFromFile("../res/sprites/pac_3_r_1b.png");
+	pac_texture[21][2].setSmooth(false);
 
 	pac_texture[0][3].loadFromFile("../res/sprites/pac_4_1.png");
 	pac_texture[0][3].setSmooth(false);
@@ -309,6 +315,8 @@ void thread_rcv(Socket client_game, bool* has_finish){
 	pac_texture[19][3].setSmooth(false);
 	pac_texture[20][3].loadFromFile("../res/sprites/pac_4_k_12.png");
 	pac_texture[20][3].setSmooth(false);
+	pac_texture[21][3].loadFromFile("../res/sprites/pac_4_r_1b.png");
+	pac_texture[21][3].setSmooth(false);
 
 	Texture lifes_texture[4];
 	lifes_texture[0].loadFromFile("../res/sprites/life_1.png");
@@ -352,8 +360,8 @@ void thread_rcv(Socket client_game, bool* has_finish){
 		state[i].setPosition(Vector2f(216, 141));
 	}
 
-	Sprite pac[21][4];
-	for(int i = 0; i < 21; i++){
+	Sprite pac[22][4];
+	for(int i = 0; i < 22; i++){
 		for(int j = 0; j < 4; j++){
 			pac[i][j].setTexture(pac_texture[i][j]);
 		}
@@ -518,6 +526,7 @@ void thread_rcv(Socket client_game, bool* has_finish){
 
 						p.set_eaten_biscuits(info.at(5));
 						p.set_item(info.at(6));
+						p.set_super_force(info.at(7));
 
 						players.push_back(p);
 					}
@@ -548,7 +557,12 @@ void thread_rcv(Socket client_game, bool* has_finish){
 					//Desenha informações (Sprite jogador)
 					for(int i = 0; i < players.size(); i++){
 						pac[5][i].setPosition(25, 25 + 30 * i);
-						window->draw(pac[5][i]);
+						pac[21][i].setPosition(25, 25 + 30 * i);
+						if(players.at(i).get_super_force() > 0){
+							window->draw(pac[21][i]);
+						}else{
+							window->draw(pac[5][i]);
+						}
 					}
 
 					//Desenha informações (X)
@@ -566,6 +580,7 @@ void thread_rcv(Socket client_game, bool* has_finish){
 						}
 					}
 
+					//Desenha informações (Bolinhas comidas)
 					for(int i = 0; i < players.size(); i++){
 						b_num = to_string(players.at(i).get_eaten_biscuits());
 						switch(b_num.size()){
