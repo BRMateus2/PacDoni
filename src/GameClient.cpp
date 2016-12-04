@@ -46,8 +46,6 @@ void thread_audio(queue<int>* audio_queue){
 			}
 		}
 	}
-
-	cout << "Audio encerrado!" << endl;
 }
 
 void thread_snd(Socket client_game, bool* has_finish, RenderWindow* window){
@@ -67,8 +65,6 @@ void thread_snd(Socket client_game, bool* has_finish, RenderWindow* window){
 			}
 		}
 	}
-
-	cout << "SND encerrado!" << endl;
 }
 
 void thread_rcv(Socket client_game, bool* has_finish){
@@ -424,10 +420,7 @@ void thread_rcv(Socket client_game, bool* has_finish){
 			this_thread::sleep_for(chrono::milliseconds(5000));
 			break;
 		}else{
-			cout << "Acho que é aqui hein!" << endl;
-			cout << msg << endl;
 			map_id = stoi(msg);
-			cout << "né não é, é nada!" << endl;
 
 			while(msg != "EOM"){
 				//BISCUITS ou Status
@@ -436,7 +429,6 @@ void thread_rcv(Socket client_game, bool* has_finish){
 				msg = string(buffer);
 
 				if(msg == "EOM"){
-					cout << "EOM" << endl;
 					break;
 				}else
 				if(msg == "1" || msg == "2" || msg == "3" || msg == "4"){
@@ -614,7 +606,6 @@ void thread_rcv(Socket client_game, bool* has_finish){
 		}
 
     }
-	cout << "RCV Encerrado!" << endl;
 }
 
 int main(int argc, char **argv){
@@ -627,10 +618,7 @@ int main(int argc, char **argv){
 	Socket client_game(ip, port);
 
 	//Conecta ao servidor
-	cout << "Iniciando conexão..." << endl;
 	if(client_game.connect() == 0){
-
-		cout << "Iniciando thread de recebimento..." << endl;
 		thread* recv = new thread(thread_rcv, client_game, has_finish);
 		recv->join();
 

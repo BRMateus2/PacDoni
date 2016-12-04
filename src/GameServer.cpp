@@ -751,10 +751,6 @@ void game_server(vector<Socket>* player_scoket){
 
 		this_thread::sleep_for(chrono::milliseconds(1000));
 
-		cout << "iniciando server!" << endl;
-
-		//################## Jogo ##########
-
 		map<pair<int,int>,char>::iterator it;
 		while(maps.at(g)->get_biscuits()->size() != 0){
 			//Para cada jogador, realiza o processamento
