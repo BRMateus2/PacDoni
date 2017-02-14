@@ -42,7 +42,9 @@ void thread_audio(queue<int>* audio_queue){
 			if(wich == -2){
 				break;
 			}else{
-				sounds[wich].play();
+				if(sounds[wich].getStatus() == SoundSource::Stopped){
+					sounds[wich].play();
+				}
 			}
 		}
 	}
